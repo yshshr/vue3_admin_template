@@ -71,6 +71,7 @@ export const constantRoutes=[
             ishidden:false,
             icon:'Lock'
         },
+        redirect:'/acl/user',
         children:[
             {
                 path:'/acl/user',
@@ -112,6 +113,7 @@ export const constantRoutes=[
             title:'商品管理',
             icon:'Goods'
         },
+        redirect:'/product/trademark',
         children:[
             {
                 path:'/product/trademark',

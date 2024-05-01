@@ -4,12 +4,26 @@
     <router-link to="/product/sku">Go to sku</router-link> -->
     <router-view v-slot="{Component}">
         <Transition name="fade">
-            <component :is="Component"></component>
+            <component :is="Component" v-if="flag"></component>
         </Transition>
     </router-view>
 </template>
 
 <script setup lang=ts>
+import {watch,ref,nextTick} from 'vue'
+import useLayOutSettingStore from '@/store/modules/setting';
+
+let layOutSettingStore = useLayOutSettingStore();
+let flag = ref(true);
+
+watch(()=>layOutSettingStore.refresh,()=>{
+    flag.value=false;
+    nextTick(()=>{
+        flag.value=true;
+    })
+
+})
+
 
 </script>
 

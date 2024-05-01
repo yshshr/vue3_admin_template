@@ -3,7 +3,7 @@
             <component :is="layOutSettingStore.fold?'Fold':'Expand'"></component>
     </el-icon>
     <el-breadcrumb separator-icon="ArrowRight">
-        <el-breadcrumb-item v-for="item in $route.matched" :key="item.path" v-show="item.meta.title">
+        <el-breadcrumb-item v-for="item in $route.matched" :key="item.path" v-show="item.meta.title" :to="item.path">
             <el-icon>
                 <component :is="item.meta.icon"></component>
             </el-icon>
