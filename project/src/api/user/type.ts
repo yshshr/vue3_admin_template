@@ -14,7 +14,7 @@ export interface loginResponseData{
 }
 
 
-interface userInfo{
+export interface userInfo{
     userId:Number,
     avatar:String,
     username:String,
@@ -27,7 +27,8 @@ interface userInfo{
 }
 
 interface user{
-    checkUser:userInfo
+    checkUser:userInfo,
+    message:String
 }
 
 

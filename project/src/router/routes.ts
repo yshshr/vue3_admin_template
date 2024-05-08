@@ -1,49 +1,17 @@
 export const constantRoutes=[
-    // {
-    //     path:'/login',
-    //     component:()=> import('@/views/login/index.vue'),
-    //     name:'login',
-    //     meta:{
-    //         title:'登录',
-    //         ishidden:false,
-    //         icon:'Search'
-    //     }
-    // },
-    // {
-    //     path:'/',
-    //     //component:()=> import('@/views/home/index.vue'),
-    //     component:()=> import('@/layout/index.vue'),
-    //     name:'layout',
-    //     meta:{
-    //         title:'首页',
-    //         ishidden:false,
-    //         icon:'HomeFilled'
-    //     },
-    //     children:[
-    //         {
-    //             path:'/home',
-    //             component:()=> import('@/views/home/index.vue'),
-    //             name:'layout',
-    //             meta:{
-    //                 title:'首页',
-    //                 ishidden:false,
-    //                 icon:'Avatar'
-    //             }
-    //         },
-    //         {
-    //             path:'/home',
-    //             component:()=> import('@/views/home/index.vue'),
-    //             name:'layout',
-    //             meta:{
-    //                 title:'二级菜单',
-    //                 ishidden:false,
-    //                 icon:'UserFilled'
-    //             }
-    //         }
-    //     ]
-    // },
+    {
+        path:'/login',
+        component:()=> import('@/views/login/index.vue'),
+        name:'login',
+        meta:{
+            title:'登录',
+            ishidden:true,
+            icon:'Search',
+        }
+    },
     {
         path:'/',
+        //component:()=> import('@/views/home/index.vue'),
         component:()=> import('@/layout/index.vue'),
         name:'layout',
         meta:{
@@ -51,7 +19,29 @@ export const constantRoutes=[
             ishidden:false,
             icon:'HomeFilled'
         },
+        children:[
+            {
+                path:'/home',
+                component:()=> import('@/views/home/index.vue'),
+                name:'Home',
+                meta:{
+                    title:'首页',
+                    ishidden:false,
+                    icon:'Avatar'
+                }
+            }
+        ]
     },
+    // {
+    //     path:'/home',
+    //     component:()=> import('@/layout/index.vue'),
+    //     name:'layout',
+    //     meta:{
+    //         title:'首页',
+    //         ishidden:false,
+    //         icon:'HomeFilled'
+    //     },
+    // },
     {
         path:'/screen/:id',
         component:()=> import('@/views/screen/index.vue'),

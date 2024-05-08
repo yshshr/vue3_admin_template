@@ -1,7 +1,7 @@
 <template>
   <div class="login_container"> 
     <el-row>
-      <el-col :span="12" :xs="0">占位</el-col>
+      <el-col :span="12" :xs="0"></el-col>
       <el-col :span="12" :xs="24">
         <el-form class="login_form" :model="formdata" :rules="rules" ref="formdataRef">
           <h1>hello</h1>
@@ -44,7 +44,7 @@ const login = async () =>{
   isloading.value=true;
   try{
     await useStore.userlogin(formdata);
-    $router.push('/');
+    $router.push('/home');
     isloading.value=false;
     ElNotification({
       type:'success',
