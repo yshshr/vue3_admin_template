@@ -25,7 +25,7 @@
 import { User,Lock} from '@element-plus/icons-vue'
 import { reactive,ref } from 'vue';
 import useUserStore from '@/store/modules/user'
-import { useRouter } from 'vue-router';
+import { useRouter,useRoute } from 'vue-router';
 import { ElNotification,FormRules,FormInstance } from 'element-plus';
 import {GET_TIME} from '@/utils/time.ts'
 import {loginForm} from '@/api/user/type.ts'
@@ -37,6 +37,8 @@ let formdata = reactive<loginForm>({username:'admin',password:'111111'});
 let isloading =ref(false);
 let useStore = useUserStore();
 let $router = useRouter();
+let $route = useRoute();
+
 let formdataRef=ref<FormInstance>();
 
 const login = async () =>{
@@ -44,7 +46,8 @@ const login = async () =>{
   isloading.value=true;
   try{
     await useStore.userlogin(formdata);
-    $router.push('/home');
+    let path:any = $route.query.redirect;
+    $router.push(path || '/home');
     isloading.value=false;
     ElNotification({
       type:'success',

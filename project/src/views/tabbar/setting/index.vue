@@ -12,18 +12,21 @@
         </span>
         <template #dropdown>
         <el-dropdown-menu>
-            <el-dropdown-item>退出</el-dropdown-item>
+            <el-dropdown-item @click="logout">退出</el-dropdown-item>
         </el-dropdown-menu>
         </template>
     </el-dropdown> 
 </template>
 
 <script setup lang=ts>
+import { useRouter,useRoute } from 'vue-router';
 import useLayOutSettingStore from '@/store/modules/setting';
 import useUserStore from '@/store/modules/user';
 
 let layOutSettingStore = useLayOutSettingStore();
 let userStore = useUserStore();
+let $router = useRouter();
+let $route = useRoute();
 
 const updateRefresh=()=>{
     layOutSettingStore.refresh=!layOutSettingStore.refresh;
@@ -37,6 +40,11 @@ const fullScreen=()=>{
         document.documentElement.requestFullscreen();
     }
     
+}
+
+const logout=()=>{
+    userStore.userlogout();
+    $router.push({path:'/login',query:{redirect:$route.path}});
 }
 
 </script>

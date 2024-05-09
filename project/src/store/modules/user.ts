@@ -2,7 +2,7 @@ import {defineStore} from 'pinia'
 import {reqLogin,reqUserInfo} from '@/api/user/index.ts'
 import {loginForm,loginResponseData,userResponseData} from '@/api/user/type.ts'
 import {UserState} from '@/store/modules/types/type.ts'
-import {SET_TOKEN,GET_TOKEN} from '@/utils/token.ts'
+import {SET_TOKEN,GET_TOKEN,REMOVE_TOKEN} from '@/utils/token.ts'
 import {constantRoutes} from '@/router/routes'
 
 
@@ -35,6 +35,12 @@ let useUserStore = defineStore('User',{
             }else{
                  //return Promise.reject(new Error(result.data.message as string));
             }
+         },
+         userlogout(){
+            this.username = '';
+            this.avatar = '';
+            this.token = '';
+            REMOVE_TOKEN();
          }
     },
     getters:{
