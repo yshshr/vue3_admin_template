@@ -32,8 +32,9 @@ let useUserStore = defineStore('User',{
             if(result.code==200){
                 this.username = result.data.checkUser.username;
                 this.avatar = result.data.checkUser.avatar;
+                return 'ok';
             }else{
-                 //return Promise.reject(new Error(result.data.message as string));
+                return Promise.reject(new Error(result.data.message as string));
             }
          },
          userlogout(){

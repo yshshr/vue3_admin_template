@@ -1,6 +1,7 @@
 <template>
   <div class="layout_container"> 
-    <div class="layout_slider" :class="{fold:layOutSettingStore.fold?false:true}">
+    <!-- <div class="layout_slider" :class="{fold:layOutSettingStore.fold?false:true}"> -->
+        <div class="layout_slider">
         <Logo></Logo>
         <el-scrollbar  class="scrollbar">
             <!-- <p v-for="item in 2000" :key="item" class="scrollbar-demo-item">{{ item }}</p> -->
