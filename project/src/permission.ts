@@ -26,7 +26,7 @@ router.beforeEach(async(to, from) => {
                 try{
                     await userStore.getUserInfo();
                 }catch(error){
-                    userStore.userlogout();
+                    await userStore.userlogout();
                     return {name:'login',query:{redirect:to.path}};
                 }
             }
