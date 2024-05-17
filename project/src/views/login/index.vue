@@ -28,10 +28,10 @@ import useUserStore from '@/store/modules/user'
 import { useRouter,useRoute } from 'vue-router';
 import { ElNotification,FormRules,FormInstance } from 'element-plus';
 import {GET_TIME} from '@/utils/time.ts'
-import {loginForm} from '@/api/user/type.ts'
+import {loginFormData} from '@/api/user/type.ts'
 
 
-let formdata = reactive<loginForm>({username:'admin',password:'111111'});
+let formdata = reactive<loginFormData>({username:'admin',password:'111111'});
 
 
 let isloading =ref(false);
@@ -80,7 +80,7 @@ const validatePassword = (_rule:any,value:any,callback:any)=>{
 }
 
 
-let rules = reactive<FormRules<loginForm>>({
+let rules = reactive<FormRules<loginFormData>>({
   username:[
     // {required:true,min:5,max:10,message:'username should be 5 to 10',trigger:'blur'}
     {validator:validateUsername,trigger:'change'}
