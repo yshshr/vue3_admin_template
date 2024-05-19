@@ -19,6 +19,8 @@
         </el-table-column>
       </el-table>    
       <el-pagination
+      @current-change	="getTradeMark"
+      @size-change ="sizeChange"
       v-model:current-page="pageNo"
       v-model:page-size="limit"
       :page-sizes="[4, 8, 16, 32]"
@@ -32,15 +34,19 @@
 <script setup lang=ts>
 import { ref ,onMounted} from 'vue';
 import {reqGetTradeMark} from '@/api/product/trademark'
+import type {record,GetTradeMarkResponseData} from '@/api/product/trademark/type.ts'
+
 
 const pageNo = ref<number>(1)
 const limit = ref<number>(3)
 const total = ref<number>(0)
-const tabledata = ref<Array<any>>([])
+const tabledata = ref<record[]>()
 
 
-const getTradeMark = async()=> {
-  let result = await reqGetTradeMark(pageNo.value,limit.value);
+const getTradeMark = async(pager=1)=> {
+  console.log(pager)
+  pageNo.value = pager;
+  let result:GetTradeMarkResponseData = await reqGetTradeMark(pageNo.value,limit.value);
   if(result.code==200){
     total.value = result.data.total;
     tabledata.value = result.data.records;
@@ -50,6 +56,10 @@ const getTradeMark = async()=> {
 onMounted(()=>{
   getTradeMark();
 })
+
+const sizeChange=()=>{
+  getTradeMark();
+}
 
 </script>
 

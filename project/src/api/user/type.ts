@@ -23,9 +23,6 @@ export interface userResponseData extends ResponseData{
     }
 }
 
-
-
-
 export interface userInfo {
     userId: Number,
     avatar: String,
@@ -38,9 +35,6 @@ export interface userInfo {
     token: String
 }
 
-interface user {
-    checkUser: userInfo,
-    message: String
-}
+
 
 
