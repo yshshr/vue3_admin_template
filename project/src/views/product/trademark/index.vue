@@ -38,8 +38,10 @@
           <el-upload
             class="avatar-uploader"
             action="/api/admin/product/fileUpload"
-            :show-file-list="false">
-            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload">
+            <img v-if="dialogFormParams.logoUrl" :src="dialogFormParams.logoUrl" class="avatar" />
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
           </el-upload>
         </el-form-item>
@@ -53,8 +55,9 @@
 
 <script setup lang=ts>
 import { ref ,onMounted,reactive} from 'vue';
-import {reqGetTradeMark} from '@/api/product/trademark'
+import {reqGetTradeMark,reqAddOrUpdateTradeMark} from '@/api/product/trademark'
 import type {record,GetTradeMarkResponseData} from '@/api/product/trademark/type.ts'
+import { UploadProps,ElMessage } from 'element-plus'
 
 
 const pageNo = ref<number>(1)
@@ -90,6 +93,8 @@ const sizeChange=()=>{
 }
 
 const addTradeMark=()=>{
+  dialogFormParams.tmName='';
+  dialogFormParams.logoUrl='';
   dialogFormVisible.value=true;
 }
 
@@ -101,8 +106,45 @@ const cancel=()=>{
   dialogFormVisible.value=false;
 }
 
-const confirm=()=>{
-  dialogFormVisible.value=false;
+const confirm = async ()=>{
+  let result : any = await reqAddOrUpdateTradeMark(dialogFormParams);
+  console.log(result);
+  if(result.code==200){
+    dialogFormVisible.value=false;
+    ElMessage({
+        type:'success',
+        message:"添加品牌成功"
+    });
+    getTradeMark();
+  }else{
+    ElMessage({
+        type:'error',
+        message:"添加品牌失败"
+    });
+    dialogFormVisible.value=false;
+  }
+}
+
+const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  if (rawFile.type === 'image/jpeg' || rawFile.type === 'image/png' || rawFile.type === 'image/gif') {
+    if (rawFile.size / 1024 / 1024 > 2) {
+      ElMessage({
+        type:'error',
+        message:"图片大小不能超过2M"
+      });
+    }
+    
+  } else{
+    ElMessage({
+        type:'error',
+        message:"文件格式必须是JPG、PNG、GIF"
+    });
+  }
+  return true
+}
+
+const handleAvatarSuccess: UploadProps['onSuccess'] = (response,uploadFile) => {
+  dialogFormParams.logoUrl = response.data;
 }
 
 </script>

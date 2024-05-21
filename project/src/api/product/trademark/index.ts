@@ -11,8 +11,8 @@ export const reqGetTradeMark=(page:number,limit:number)=>request.get<any,GetTrad
 
 export const reqAddOrUpdateTradeMark=(data:record)=>{
     if(data.id){
-        request.post<any,any>(API.EDITTRADEMARK_URL,data);
+       return request.post<any,any>(API.EDITTRADEMARK_URL,data);
     }else{
-        request.post<any,any>(API.ADDTRADEMARK_URL,data);
+       return request.post<any,any>(API.ADDTRADEMARK_URL,data);
     }
 }
