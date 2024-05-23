@@ -16,7 +16,7 @@ export interface GetTradeMarkResponseData extends ResponseData{
 }
 
 export interface record {
-    id?: Number,
+    id?: Number|null,
     createTime: String,
     updateTime: String,
     tmName: String,

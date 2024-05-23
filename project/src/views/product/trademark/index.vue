@@ -12,7 +12,7 @@
         </el-table-column>
         <el-table-column prop="op" label="品牌操作" width="180">
           <template #="{ row , $index}">
-            <el-button type="primary" size="small" icon="Edit" @click="editTradeMark">修改</el-button>
+            <el-button type="primary" size="small" icon="Edit" @click="editTradeMark(row)">修改</el-button>
             <el-button type="danger" size="small" icon="Delete" >删除</el-button>
 
           </template>
@@ -29,12 +29,12 @@
       :total="total"
     />
     </el-card>
-    <el-dialog v-model="dialogFormVisible" title="添加品牌" width="500">
-      <el-form style="width:80%" >
-        <el-form-item label="品牌名称" label-width="100px">
+    <el-dialog v-model="dialogFormVisible" :title="dialogFormParams.id?'修改品牌':'添加品牌'" width="500">
+        <el-form style="width:80%" :model="dialogFormParams" :rules="rules">
+        <el-form-item prop="tmName" label="品牌名称" label-width="100px">
           <el-input v-model="dialogFormParams.tmName" placeholder="请输入品牌名称" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="品牌LOGO" label-width="100px">
+        <el-form-item label="品牌LOGO" label-width="100px" prop="logoUrl">
           <el-upload
             class="avatar-uploader"
             action="/api/admin/product/fileUpload"
@@ -57,7 +57,8 @@
 import { ref ,onMounted,reactive} from 'vue';
 import {reqGetTradeMark,reqAddOrUpdateTradeMark} from '@/api/product/trademark'
 import type {record,GetTradeMarkResponseData} from '@/api/product/trademark/type.ts'
-import { UploadProps,ElMessage } from 'element-plus'
+import { UploadProps,ElMessage,FormRules} from 'element-plus'
+
 
 
 const pageNo = ref<number>(1)
@@ -75,7 +76,6 @@ const dialogFormParams = reactive<record>(
 })
 
 const getTradeMark = async(pager=1)=> {
-  console.log(pager)
   pageNo.value = pager;
   let result:GetTradeMarkResponseData = await reqGetTradeMark(pageNo.value,limit.value);
   if(result.code==200){
@@ -93,13 +93,15 @@ const sizeChange=()=>{
 }
 
 const addTradeMark=()=>{
+  dialogFormParams.id=null;
   dialogFormParams.tmName='';
   dialogFormParams.logoUrl='';
   dialogFormVisible.value=true;
 }
 
-const editTradeMark=()=>{
+const editTradeMark=(row:record)=>{
   dialogFormVisible.value=true;
+  Object.assign(dialogFormParams,row);
 }
 
 const cancel=()=>{
@@ -113,13 +115,13 @@ const confirm = async ()=>{
     dialogFormVisible.value=false;
     ElMessage({
         type:'success',
-        message:"添加品牌成功"
+        message:dialogFormParams.id?"修改品牌成功":"添加品牌成功"
     });
-    getTradeMark();
+    getTradeMark(dialogFormParams.id?pageNo.value:1);
   }else{
     ElMessage({
         type:'error',
-        message:"添加品牌失败"
+        message:dialogFormParams.id?"修改品牌失败":"添加品牌失败"
     });
     dialogFormVisible.value=false;
   }
@@ -146,6 +148,24 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response,uploadFile) => {
   dialogFormParams.logoUrl = response.data;
 }
+
+const validateTmName = (_rule:any,value:any,callback:any)=>{
+  console.log("value:"+value,_rule)
+  if(value.length >= 2){
+    callback();
+  }else{
+    callback(new Error('tmName至少2位'));
+  }
+}
+
+
+let rules = reactive<FormRules<record>>({
+  tmName:[
+    // {required:true,min:5,max:10,message:'username should be 5 to 10',trigger:'blur'}
+    {required:true,validator:validateTmName,trigger:'blur'}
+  ]
+});
+
 
 </script>
 
