@@ -13,8 +13,11 @@
         <el-table-column prop="op" label="品牌操作" width="180">
           <template #="{ row , $index}">
             <el-button type="primary" size="small" icon="Edit" @click="editTradeMark(row)">修改</el-button>
-            <el-button type="danger" size="small" icon="Delete" >删除</el-button>
-
+            <el-popconfirm :title="`您确定删除${row.tmName}吗?`" width="250px" @confirm="deleteTrademark(row.id)">
+              <template #reference>
+                <el-button type="danger" size="small" icon="Delete">删除</el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>    
@@ -55,7 +58,7 @@
 
 <script setup lang=ts>
 import { ref ,onMounted,reactive, nextTick} from 'vue';
-import {reqGetTradeMark,reqAddOrUpdateTradeMark} from '@/api/product/trademark'
+import {reqGetTradeMark,reqAddOrUpdateTradeMark,reqDeleteTradeMark} from '@/api/product/trademark'
 import type {record,GetTradeMarkResponseData} from '@/api/product/trademark/type.ts'
 import { UploadProps,ElMessage,FormRules,FormInstance} from 'element-plus'
 
@@ -65,7 +68,7 @@ let formRef=ref<FormInstance>();
 const pageNo = ref<number>(1)
 const limit = ref<number>(3)
 const total = ref<number>(0)
-const tabledata = ref<record[]>()
+const tabledata = ref<record[]>([])
 const dialogFormVisible = ref<boolean>(false)
 const dialogFormParams = reactive<record>(
   {
@@ -114,15 +117,30 @@ const editTradeMark=(row:record)=>{
   })
 }
 
+const deleteTrademark= async(id:number)=>{
+  let result : any = await reqDeleteTradeMark(id);
+  if(result.code==200){
+    ElMessage({
+        type:'success',
+        message:"删除品牌成功"
+    });
+    getTradeMark(tabledata.value.length>1?pageNo.value:pageNo.value-1);
+  }else{
+    ElMessage({
+        type:'error',
+        message:"删除品牌失败"
+    });
+  }
+
+}
+
 const cancel=()=>{
   dialogFormVisible.value=false;
 }
 
 const confirm = async ()=>{
   await formRef.value?.validate();
-
   let result : any = await reqAddOrUpdateTradeMark(dialogFormParams);
-  console.log(result);
   if(result.code==200){
     dialogFormVisible.value=false;
     ElMessage({
