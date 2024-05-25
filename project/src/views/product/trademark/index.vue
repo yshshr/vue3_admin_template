@@ -30,7 +30,7 @@
     />
     </el-card>
     <el-dialog v-model="dialogFormVisible" :title="dialogFormParams.id?'修改品牌':'添加品牌'" width="500">
-        <el-form style="width:80%" :model="dialogFormParams" :rules="rules">
+        <el-form style="width:80%" :model="dialogFormParams" :rules="rules" ref="formRef">
         <el-form-item prop="tmName" label="品牌名称" label-width="100px">
           <el-input v-model="dialogFormParams.tmName" placeholder="请输入品牌名称" autocomplete="off" />
         </el-form-item>
@@ -54,11 +54,12 @@
 </template>
 
 <script setup lang=ts>
-import { ref ,onMounted,reactive} from 'vue';
+import { ref ,onMounted,reactive, nextTick} from 'vue';
 import {reqGetTradeMark,reqAddOrUpdateTradeMark} from '@/api/product/trademark'
 import type {record,GetTradeMarkResponseData} from '@/api/product/trademark/type.ts'
-import { UploadProps,ElMessage,FormRules} from 'element-plus'
+import { UploadProps,ElMessage,FormRules,FormInstance} from 'element-plus'
 
+let formRef=ref<FormInstance>();
 
 
 const pageNo = ref<number>(1)
@@ -97,11 +98,20 @@ const addTradeMark=()=>{
   dialogFormParams.tmName='';
   dialogFormParams.logoUrl='';
   dialogFormVisible.value=true;
+  nextTick(()=>{
+    formRef.value?.clearValidate("tmName");
+    formRef.value?.clearValidate("logoUrl");
+  })
 }
 
 const editTradeMark=(row:record)=>{
   dialogFormVisible.value=true;
   Object.assign(dialogFormParams,row);
+  nextTick(()=>{
+    formRef.value?.clearValidate("tmName");
+    formRef.value?.clearValidate("logoUrl");
+    formRef.value?.clearValidate("logoUrl");
+  })
 }
 
 const cancel=()=>{
@@ -109,6 +119,8 @@ const cancel=()=>{
 }
 
 const confirm = async ()=>{
+  await formRef.value?.validate();
+
   let result : any = await reqAddOrUpdateTradeMark(dialogFormParams);
   console.log(result);
   if(result.code==200){
@@ -147,6 +159,7 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response,uploadFile) => {
   dialogFormParams.logoUrl = response.data;
+  formRef.value?.clearValidate("logoUrl");
 }
 
 const validateTmName = (_rule:any,value:any,callback:any)=>{
@@ -158,11 +171,24 @@ const validateTmName = (_rule:any,value:any,callback:any)=>{
   }
 }
 
+const validatelogoUrl = (_rule:any,value:any,callback:any)=>{
+  console.log("value:"+value,_rule)
+  if(value){
+    callback();
+  }else{
+    callback(new Error('必须上传图片'));
+  }
+}
+
 
 let rules = reactive<FormRules<record>>({
   tmName:[
     // {required:true,min:5,max:10,message:'username should be 5 to 10',trigger:'blur'}
     {required:true,validator:validateTmName,trigger:'blur'}
+  ],
+  logoUrl:[
+    // {required:true,min:5,max:10,message:'username should be 5 to 10',trigger:'blur'}
+    {required:true,validator:validatelogoUrl}
   ]
 });
 
