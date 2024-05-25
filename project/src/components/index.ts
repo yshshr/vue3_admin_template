@@ -1,10 +1,11 @@
 import SvgIcon from './svgIcon/index.vue'
+import Category from './category/index.vue'
 import type { App, Component } from 'vue';
 import * as ElemenyPlusIconsVue from '@element-plus/icons-vue'
 
 console.log(ElemenyPlusIconsVue);
 
-const allGloablComponent: { [name: string]: Component } ={ SvgIcon };
+const allGloablComponent: { [name: string]: Component } ={ SvgIcon,Category };
 export default {
     install(app: App) {
         Object.keys(allGloablComponent).forEach((key:string) => {
