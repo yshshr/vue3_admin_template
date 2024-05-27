@@ -3,17 +3,17 @@
         <el-card>
             <el-form inline="true">
                 <el-form-item label="一级分类" style="width:300px">
-                    <el-select v-model="categoryStore.c1value"  @change="handler">
+                    <el-select v-model="categoryStore.c1value"  @change="handler" :disabled="scene==0?false:true">
                     <el-option v-for="c1item in categoryStore.c1Arr" :label="c1item.name" :key="c1item.id" :value="c1item.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="二级分类" style="width:300px">
-                    <el-select v-model="categoryStore.c2value" @change="handlerc2">
+                    <el-select v-model="categoryStore.c2value" @change="handlerc2" :disabled="scene==0?false:true">
                     <el-option v-for="c2item in categoryStore.c2Arr" :label="c2item.name" :key="c2item.id" :value="c2item.id"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="三级分类" style="width:300px">
-                    <el-select v-model="categoryStore.c3value">
+                    <el-select v-model="categoryStore.c3value" :disabled="scene==0?false:true">
                     <el-option  v-for="c3item in categoryStore.c3Arr" :label="c3item.name" :key="c3item.id" :value="c3item.id"></el-option>
                     </el-select>
                 </el-form-item>
@@ -27,6 +27,9 @@
     import useCategoryStore from '@/store/modules/category'
 
     let categoryStore = useCategoryStore();
+
+    defineProps(['scene']);
+
 
     onMounted(()=>{
         getC1();

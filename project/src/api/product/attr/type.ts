@@ -17,7 +17,26 @@ export interface CategoryObj {
     category2Id?: Number,
 }
 
+export interface GetAttrInfoListResponseData extends ResponseData{
+    data: AttrInfo[]
+}
 
+export interface AttrInfo {
+    id: Number|null,
+    attrName: String,
+    updateTime: String,
+    createTime: String,
+    categoryId: Number,
+    attrValueList: attrValue[]
+}
+
+export interface attrValue {
+    id: Number|null,
+    valueName: String,
+    updateTime: String,
+    createTime: String,
+    attrId: Number
+}
 
 
 
