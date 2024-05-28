@@ -26,7 +26,8 @@ export interface AttrInfo {
     attrName: String,
     updateTime: String,
     createTime: String,
-    categoryId: Number,
+    categoryId: Number|null,
+    categoryLevel:Number,
     attrValueList: attrValue[]
 }
 
@@ -35,7 +36,7 @@ export interface attrValue {
     valueName: String,
     updateTime: String,
     createTime: String,
-    attrId: Number
+    attrId: Number|null
 }
 
 
