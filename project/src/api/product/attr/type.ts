@@ -36,7 +36,8 @@ export interface attrValue {
     valueName: String,
     updateTime: String,
     createTime: String,
-    attrId: Number|null
+    attrId: Number|null,
+    isLook: Boolean
 }
 
 

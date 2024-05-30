@@ -37,12 +37,13 @@
         <el-table-column label="序号" width="80px" align="center" type="index" />
         <el-table-column label="属性值名称" align="center" >
           <template #="{row,$index}">
-            <el-input placeholder="请输入属性值名称" v-model="row.valueName"></el-input>
+            <el-input placeholder="请输入属性值名称" v-model="row.valueName" v-if="!row.isLook" @blur="$event=>toLook(row,$index)"></el-input>
+            <div v-else @click="$event=>toEdit(row)">{{row.valueName}}</div>
           </template>
         </el-table-column>
         <el-table-column label="属性值操作" align="center"/>
       </el-table>
-      <el-button type="primary" size="default" @click="save">保存</el-button>
+      <el-button type="primary" size="default" @click="save" :disabled="attrParams.attrValueList.length==0">保存</el-button>
       <el-button type="primary" size="default" @click="cancel">取消</el-button>
     </div>
   </el-card>
@@ -53,7 +54,7 @@
 import useCategoryStore from '@/store/modules/category';
 import { watch, ref,reactive } from 'vue';
 import { reqAttrInfoList,reqSaveOrUpdateAttrInfo } from '@/api/product/attr'
-import type { GetAttrInfoListResponseData, AttrInfo } from '@/api/product/attr/type'
+import type { GetAttrInfoListResponseData, AttrInfo,attrValue } from '@/api/product/attr/type'
 import { ElMessage } from 'element-plus';
 
 let categoryStore = useCategoryStore();
@@ -106,11 +107,12 @@ const cancel = ()=>{
 
 const addAttrValue = ()=>{
   attrParams.attrValueList.push({
-    'valueName':'',
-    'attrId':null,
-    'id':null,
-    'createTime':'',
-    'updateTime':''
+    valueName:'',
+    attrId:null,
+    id:null,
+    createTime:'',
+    updateTime:'',
+    isLook:false
   })
 }
 
@@ -133,6 +135,34 @@ const save = async()=>{
   
 }
 
+const toEdit =(row:attrValue)=>{
+  row.isLook = false;
+}
+
+const toLook =(row:attrValue,index:number) =>{
+  if(row.valueName.trim()===''){
+    ElMessage({
+        type:'error',
+        message:"属性值名称不能为空"
+    });
+    attrParams.attrValueList.splice(index,1);
+    return;
+  }
+
+  let repeatItem = attrParams.attrValueList.find((item)=>{
+    return item!=row && item.valueName==row.valueName 
+  });
+  if(repeatItem){
+    ElMessage({
+        type:'error',
+        message:"属性值名称不能重复"
+    });
+    attrParams.attrValueList.splice(index,1);
+    return;
+  }
+
+  row.isLook = true;
+}
 
 </script>
 
