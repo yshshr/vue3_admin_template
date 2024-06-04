@@ -18,8 +18,12 @@
         </el-table-column>
         <el-table-column label="操作" width="180px" align="center">
           <template #="{ row, $index }">
-            <el-button type="primary" size="small" icon="Edit" @click="updateAttr">修改</el-button>
-            <el-button type="primary" size="small" icon="Delete">删除</el-button>
+            <el-button type="primary" size="small" icon="Edit" @click="updateAttr(row)">修改</el-button>
+            <el-popconfirm :title="`您确定删除${row.attrName}吗?`" width="250px" @confirm="removeAttr(row.id)">
+              <template #reference>
+                <el-button type="danger" size="small" icon="Delete">删除</el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -37,11 +41,15 @@
         <el-table-column label="序号" width="80px" align="center" type="index" />
         <el-table-column label="属性值名称" align="center" >
           <template #="{row,$index}">
-            <el-input placeholder="请输入属性值名称" v-model="row.valueName" v-if="!row.isLook" @blur="$event=>toLook(row,$index)"></el-input>
+            <el-input placeholder="请输入属性值名称" v-model="row.valueName" v-if="row.isLook==false" @blur="$event=>toLook(row,$index)" ref="form_name"></el-input>
             <div v-else @click="$event=>toEdit(row)">{{row.valueName}}</div>
           </template>
         </el-table-column>
-        <el-table-column label="属性值操作" align="center"/>
+        <el-table-column label="属性值操作" align="center">
+          <template #="{row,$index}">
+            <el-button type="danger" size="small" icon="Delete" @click="attrParams.attrValueList.splice($index,1)">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <el-button type="primary" size="default" @click="save" :disabled="attrParams.attrValueList.length==0">保存</el-button>
       <el-button type="primary" size="default" @click="cancel">取消</el-button>
@@ -52,14 +60,17 @@
 
 <script setup lang=ts>
 import useCategoryStore from '@/store/modules/category';
-import { watch, ref,reactive } from 'vue';
-import { reqAttrInfoList,reqSaveOrUpdateAttrInfo } from '@/api/product/attr'
+import { watch, ref,reactive,nextTick,onBeforeUnmount } from 'vue';
+import { reqAttrInfoList,reqSaveOrUpdateAttrInfo,reqDeleteAttr } from '@/api/product/attr'
 import type { GetAttrInfoListResponseData, AttrInfo,attrValue } from '@/api/product/attr/type'
 import { ElMessage } from 'element-plus';
 
 let categoryStore = useCategoryStore();
 let attrArr = ref<AttrInfo[]>([]);
 let scene = ref(0);
+let form_name = ref();
+
+
 
 let attrParams = reactive<AttrInfo>({
     id: null,
@@ -97,8 +108,25 @@ const addAttr = ()=>{
   scene.value=1;
 }
 
-const updateAttr = ()=>{
+const updateAttr = (row:AttrInfo)=>{
   scene.value=1;
+  Object.assign(attrParams,JSON.parse(JSON.stringify(row)));
+}
+
+const removeAttr = async(attrId:number)=>{
+  let result: any = await reqDeleteAttr(attrId);
+  if(result.code==200){
+    ElMessage({
+        type:'success',
+        message: "删除属性值成功"
+    });
+    getAttr();
+  }else{
+    ElMessage({
+        type:'error',
+        message: "删除属性值失败"
+    });
+  }
 }
 
 const cancel = ()=>{
@@ -113,6 +141,9 @@ const addAttrValue = ()=>{
     createTime:'',
     updateTime:'',
     isLook:false
+  })
+  nextTick(()=>{
+    form_name.value.focus();
   })
 }
 
@@ -137,6 +168,9 @@ const save = async()=>{
 
 const toEdit =(row:attrValue)=>{
   row.isLook = false;
+  nextTick(()=>{
+    form_name.value.focus();
+  })
 }
 
 const toLook =(row:attrValue,index:number) =>{
@@ -163,6 +197,10 @@ const toLook =(row:attrValue,index:number) =>{
 
   row.isLook = true;
 }
+
+onBeforeUnmount(()=>{
+  categoryStore.$reset();
+})
 
 </script>
 
