@@ -3,12 +3,19 @@
     <Category :scene="scene"></Category>
   </div> 
   <el-card style="margin:10px 0px;">
-    <el-button type="primary" icon="Plus">添加SPU</el-button>
-    <el-table style="margin:10px 0px;" border :data="spuRecords">
+    <el-button type="primary" icon="Plus" :disabled="categoryStore.c3value?false:true">添加SPU</el-button>
+    <el-table style="margin:10px 0px;" border :data="spuRecords" show-overflow-tooltip="true">
       <el-table-column label="序号" width="80px" type="index"></el-table-column>
-      <el-table-column label="SPU名称" prop="spuName"></el-table-column>
+      <el-table-column label="SPU名称" prop="spuName" ></el-table-column>
       <el-table-column label="SPU描述" prop="description"></el-table-column>
-      <el-table-column label="SPU操作"></el-table-column>
+      <el-table-column label="SPU操作">
+        <template  #="{row,$index}">
+          <el-button type="primary" size="small" icon="Plus" title="新增SKU"></el-button>
+          <el-button type="primary" size="small" icon="Edit" title="修改SKU"></el-button>
+          <el-button type="primary" size="small" icon="View" title="查看SKU"></el-button>
+          <el-button type="primary" size="small" icon="Delete" title="删除SKU"></el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination
       v-model:current-page="currentPage"
@@ -16,7 +23,9 @@
       :page-sizes="[3, 5, 7, 9]"
       :background="true"
       layout=" prev, pager, next, jumper,->,sizes,total"
-      :total="400"
+      :total="total"
+      @current-change	="getSpu"
+      @size-change ="sizeChange"
     />
   </el-card>
 </template>
@@ -35,6 +44,7 @@
   let currentPage = ref(1);
   let pageSize = ref(3);
   let spuRecords = ref<SpuData[]>([]);
+  let total = ref(0);
 
 
   watch(()=>categoryStore.c3value,()=>{
@@ -43,11 +53,17 @@
     }
   })
 
-  const getSpu= async()=>{
+  const getSpu= async(pager=1)=>{
+    currentPage.value = pager;
     let result:GetSpuResponseData = await reqGetSpu(currentPage.value,pageSize.value,categoryStore.c3value);
     if(result.code==200){
       spuRecords.value = result.data.records;
+      total.value = result.data.total;
     }
+  }
+
+  const sizeChange=()=>{
+    getSpu();
   }
 
 </script>
