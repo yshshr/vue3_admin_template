@@ -2,32 +2,42 @@
   <div> 
     <Category :scene="scene"></Category>
   </div> 
+  
   <el-card style="margin:10px 0px;">
-    <el-button type="primary" icon="Plus" :disabled="categoryStore.c3value?false:true">添加SPU</el-button>
-    <el-table style="margin:10px 0px;" border :data="spuRecords" show-overflow-tooltip="true">
-      <el-table-column label="序号" width="80px" type="index"></el-table-column>
-      <el-table-column label="SPU名称" prop="spuName" ></el-table-column>
-      <el-table-column label="SPU描述" prop="description"></el-table-column>
-      <el-table-column label="SPU操作">
-        <template  #="{row,$index}">
-          <el-button type="primary" size="small" icon="Plus" title="新增SKU"></el-button>
-          <el-button type="primary" size="small" icon="Edit" title="修改SKU"></el-button>
-          <el-button type="primary" size="small" icon="View" title="查看SKU"></el-button>
-          <el-button type="primary" size="small" icon="Delete" title="删除SKU"></el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-pagination
-      v-model:current-page="currentPage"
-      v-model:page-size="pageSize"
-      :page-sizes="[3, 5, 7, 9]"
-      :background="true"
-      layout=" prev, pager, next, jumper,->,sizes,total"
-      :total="total"
-      @current-change	="getSpu"
-      @size-change ="sizeChange"
-    />
+    <div v-show="scene==0">
+      <el-button type="primary" icon="Plus" :disabled="categoryStore.c3value?false:true" @click="addSpu">添加SPU</el-button>
+      <el-table style="margin:10px 0px;" border :data="spuRecords" show-overflow-tooltip="true">
+        <el-table-column label="序号" width="80px" type="index"></el-table-column>
+        <el-table-column label="SPU名称" prop="spuName" ></el-table-column>
+        <el-table-column label="SPU描述" prop="description"></el-table-column>
+        <el-table-column label="SPU操作">
+          <template  #="{row,$index}">
+            <el-button type="primary" size="small" icon="Plus" title="新增SKU"></el-button>
+            <el-button type="primary" size="small" icon="Edit" title="修改SPU" @click="editSpu"></el-button>
+            <el-button type="primary" size="small" icon="View" title="查看SPU"></el-button>
+            <el-button type="primary" size="small" icon="Delete" title="删除SPU"></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
+        :page-sizes="[3, 5, 7, 9]"
+        :background="true"
+        layout=" prev, pager, next, jumper,->,sizes,total"
+        :total="total"
+        @current-change	="getSpu"
+        @size-change ="sizeChange"
+      />
+    </div>
+    <div v-show="scene==1">
+      <SpuForm @change-scene="changeScene"></SpuForm>
+    </div>
+    <div v-show="scene==2">
+      <SkuForm></SkuForm>
+    </div>
   </el-card>
+  
 </template>
 
 <script setup lang=ts>
@@ -36,7 +46,8 @@
 
   import type{GetSpuResponseData,SpuData} from '@/api/product/spu/type'
   import {reqGetSpu} from '@/api/product/spu'
-
+  import SpuForm from './SpuForm.vue'
+  import SkuForm from './SkuForm.vue'
 
   let categoryStore = useCategoryStore();
 
@@ -66,6 +77,18 @@
     getSpu();
   }
 
+  const addSpu=()=>{
+    scene.value=1;
+  }
+
+  const editSpu=()=>{
+    scene.value=1;
+  }
+  
+  const changeScene=(num:number)=>{
+    scene.value = num;
+  }
+  
 </script>
 
 <style scoped>
