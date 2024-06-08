@@ -49,12 +49,34 @@
 </template>
 
 <script setup lang=ts>
+import type {AllTradeMarkData,SpuImageData,SpuSaleAttrData,AllSaleAttrData,SpuData} from '@/api/product/spu/type'
+import {reqGetAllTradeMark,reqGetSpuImageList,reqGetSpuSaleAttrList,reqGetAllSaleAttrList} from '@/api/product/spu'
+import { ref } from 'vue';
 
 let $emit = defineEmits(['changeScene'])
+let allTradeMark = ref<AllTradeMarkData[]>([]);
+let spuImageArr = ref<SpuImageData[]>([]);
+let spuSaleAttrArr = ref<SpuSaleAttrData[]>([]);
+let allSaleAttrArr = ref<AllSaleAttrData[]>([]);
+
 
 const cancel =()=>{
     $emit('changeScene',0);
 }
+
+const initGetSpuDta= async(row:SpuData)=>{
+    let result = await reqGetAllTradeMark();
+    let result1 = await reqGetSpuImageList(row.id);
+    let result2 = await reqGetSpuSaleAttrList(row.id);
+    let result3 = await reqGetAllSaleAttrList();
+    allTradeMark.value = result.data;
+    spuImageArr.value = result1.data;
+    spuSaleAttrArr.value = result2.data;
+    allSaleAttrArr.value = result3.data;
+}
+
+defineExpose([initGetSpuDta])
+
 </script>
 
 <style scoped>
