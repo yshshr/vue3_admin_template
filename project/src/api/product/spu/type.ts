@@ -21,15 +21,15 @@ export interface GetSpuResponseData extends ResponseData{
 }
 
 export interface SpuData {
-    id: number|null,
-    createTime: string,
-    updateTime: string,
+    id?: number,
+    createTime?: string,
+    updateTime?: string,
     spuName: string,
     description: string,
-    category3Id: number,
-    tmId: number,
-    spuSaleAttrList: null,
-    spuImageList: null,
+    category3Id: number|null,
+    tmId: number|null,
+    spuSaleAttrList: SpuSaleAttrData[]|null,
+    spuImageList: SpuImageData[]|null,
     spuPosterList: null
 }
 
