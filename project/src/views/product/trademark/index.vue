@@ -164,6 +164,7 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
         type:'error',
         message:"图片大小不能超过2M"
       });
+      return false;
     }
     
   } else{
@@ -171,6 +172,7 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
         type:'error',
         message:"文件格式必须是JPG、PNG、GIF"
     });
+    return false;
   }
   return true
 }
