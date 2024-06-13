@@ -27,18 +27,16 @@
             </el-dialog>
         </el-form-item>         
         <el-form-item label="SPU销售属性">
-            <el-select>
-                <el-option label="华为"></el-option>
-                <el-option label="oppo"></el-option>
-                <el-option label="vivo"></el-option>
+            <el-select v-model="selectedSaleAttr" style="width:200px" :placeholder="unSelectSaleAttrArr.length > 0 ? `还未选择${unSelectSaleAttrArr.length}个`:'请选择'">
+                <el-option v-for="item in unSelectSaleAttrArr" :key="item.id" :label="item.name" :value="`${item.id}:${item.name}`"></el-option>
             </el-select>
-            <el-button type="primary" style="margin-top:10px">添加属性值</el-button>
+            <el-button type="primary" style="margin:0px 10px" :disabled="selectedSaleAttr?false:true" @click="addSaleAttr">添加属性值</el-button>
             <el-table style="margin:10px 0px" border :data="spuSaleAttrArr">
                 <el-table-column label="序号" type="index" width="80px"></el-table-column>
-                <el-table-column label="销售属性名字" ></el-table-column>
+                <el-table-column label="销售属性名字" prop="saleAttrName"></el-table-column>
                 <el-table-column label="销售属性值" >
                     <template #="{ row, $index }">
-                        <el-tag v-for="item in row.SpuSaleAttrValueData" :key="item.id" style="margin:5px">
+                        <el-tag v-for="item in row.spuSaleAttrValueList" :key="item.id" style="margin:5px">
                         {{ item.saleAttrValueName }}
                         </el-tag>
                         <el-button type="primary" size="small" icon="Plus" >新增</el-button>
@@ -61,7 +59,7 @@
 <script setup lang=ts>
 import type {AllTradeMarkData,SpuImageData,SpuSaleAttrData,AllSaleAttrData,SpuData} from '@/api/product/spu/type'
 import {reqGetAllTradeMark,reqGetSpuImageList,reqGetSpuSaleAttrList,reqGetAllSaleAttrList} from '@/api/product/spu'
-import { ref } from 'vue';
+import { ref,computed } from 'vue';
 import { ElMessage } from 'element-plus';
 
 let $emit = defineEmits(['changeScene'])
@@ -72,6 +70,15 @@ let allSaleAttrArr = ref<AllSaleAttrData[]>([]);
 let imageFileList = ref<SpuImageData>([]);
 let dialogVisible = ref<boolean>(false);
 let dialogImageUrl = ref('')
+let selectedSaleAttr = ref('')
+
+let unSelectSaleAttrArr = computed(() => {
+  return allSaleAttrArr.value.filter((item)=>{
+    return spuSaleAttrArr.value.every((spuSaleAttrItem)=>{
+        return spuSaleAttrItem.saleAttrName != item.name;
+    })
+  })
+})
 
 
 let spuParams = ref<SpuData>({
@@ -133,6 +140,19 @@ const beforeImageUpload = (rawFile:any)=>{
         return false;
     }
     return true
+}
+
+const addSaleAttr = ()=>{
+    console.log(selectedSaleAttr.value);
+    let [baseSaleAttrId,saleAttrName] = selectedSaleAttr.value.split(':');
+    let newSaleAttr:SpuSaleAttrData = {
+        baseSaleAttrId:parseInt(baseSaleAttrId),
+        saleAttrName,
+        spuSaleAttrValueList: []
+    }
+
+    spuSaleAttrArr.value.push(newSaleAttr);
+    selectedSaleAttr.value = '';
 }
 
 

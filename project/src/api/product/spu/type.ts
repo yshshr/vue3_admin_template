@@ -64,11 +64,11 @@ export interface GetSpuSaleAttrListResponseData extends ResponseData{
 
 export interface SpuSaleAttrData {
     id?: number,
-    createTime: string,
-    updateTime: string,
+    createTime?: string,
+    updateTime?: string,
     baseSaleAttrId: number,
     saleAttrName: string,
-    spuId: number,
+    spuId?: number,
     spuSaleAttrValueList: SpuSaleAttrValueData[]
 }
 
