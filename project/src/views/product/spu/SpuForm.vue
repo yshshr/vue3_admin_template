@@ -36,15 +36,16 @@
                 <el-table-column label="销售属性名字" prop="saleAttrName"></el-table-column>
                 <el-table-column label="销售属性值" >
                     <template #="{ row, $index }">
-                        <el-tag v-for="item in row.spuSaleAttrValueList" :key="item.id" style="margin:5px">
+                        <el-tag v-for="(item,index) in row.spuSaleAttrValueList" :key="item.id" style="margin:5px" closable @close="row.spuSaleAttrValueList.splice(index,1)">
                         {{ item.saleAttrValueName }}
                         </el-tag>
-                        <el-button type="primary" size="small" icon="Plus" >新增</el-button>
+                        <el-input v-if="row.flag" size="small" style="width:80px" v-model="row.saleAttrValue" @blur="$event=>toLook(row)"></el-input>
+                        <el-button v-else type="primary" size="small" icon="Plus" @click="toEdit(row)">新增</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" >
                     <template #="{ row, $index }">
-                        <el-button type="primary" size="small" icon="Delete" onclick="spuSaleAttrArr.splice($index,1)"></el-button>
+                        <el-button type="primary" size="small" icon="Delete" @click="spuSaleAttrArr.splice($index,1)"></el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -143,18 +144,48 @@ const beforeImageUpload = (rawFile:any)=>{
 }
 
 const addSaleAttr = ()=>{
-    console.log(selectedSaleAttr.value);
     let [baseSaleAttrId,saleAttrName] = selectedSaleAttr.value.split(':');
     let newSaleAttr:SpuSaleAttrData = {
         baseSaleAttrId:parseInt(baseSaleAttrId),
         saleAttrName,
         spuSaleAttrValueList: []
     }
-
     spuSaleAttrArr.value.push(newSaleAttr);
     selectedSaleAttr.value = '';
 }
 
+const toEdit = (row:SpuSaleAttrData)=>{
+    row.flag = true;
+}
+
+const toLook = (row:SpuSaleAttrData)=>{
+    let {baseSaleAttrId,saleAttrValue} =row;  
+    let newSaleAttrValue ={
+        baseSaleAttrId,
+        saleAttrValueName:saleAttrValue,
+    }
+    if((saleAttrValue as string).trim()==''){
+        ElMessage({
+            type:'error',
+            message:"销售属性值不能为空"
+        });
+        return;
+    }
+    let repeatItem = row.spuSaleAttrValueList.find((item)=>{
+        return item.saleAttrValueName==row.saleAttrValue; 
+    })
+    if(repeatItem){
+        ElMessage({
+            type:'error',
+            message:"销售属性值不能重复"
+        });
+        return;
+    }
+
+    row.spuSaleAttrValueList.push(newSaleAttrValue);
+    row.saleAttrValue='';
+    row.flag = false;
+}
 
 defineExpose({initGetSpuDta})
 

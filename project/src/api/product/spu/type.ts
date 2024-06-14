@@ -69,18 +69,20 @@ export interface SpuSaleAttrData {
     baseSaleAttrId: number,
     saleAttrName: string,
     spuId?: number,
-    spuSaleAttrValueList: SpuSaleAttrValueData[]
+    spuSaleAttrValueList: SpuSaleAttrValueData[],
+    flag?:boolean,
+    saleAttrValue?:string
 }
 
 export interface SpuSaleAttrValueData {
     id?: number,
-    createTime: string,
-    updateTime: string,
-    isChecked: string
+    createTime?: string,
+    updateTime?: string,
+    isChecked?: string
     baseSaleAttrId: number,
-    saleAttrName: string,
-    saleAttrValueName: string,
-    spuId: number
+    saleAttrName?: string,
+    saleAttrValueName?: string,
+    spuId?: number
 }
 
 export interface GetAllSaleAttrListResponseData extends ResponseData{
