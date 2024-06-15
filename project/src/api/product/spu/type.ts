@@ -50,12 +50,12 @@ export interface GetSpuImageListResponseData extends ResponseData{
 }
 
 export interface SpuImageData {
-    id: number,
-    createTime: string,
-    updateTime: string,
+    id?: number,
+    createTime?: string,
+    updateTime?: string,
     imgName: string,
     imgUrl: string,
-    spuId: number
+    spuId?: number
 }
 
 export interface GetSpuSaleAttrListResponseData extends ResponseData{

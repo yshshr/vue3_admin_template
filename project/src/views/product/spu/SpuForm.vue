@@ -51,24 +51,23 @@
             </el-table>
         </el-form-item>
         <el-form-item >
-            <el-button type="primary" >保存</el-button>
+            <el-button type="primary" @click="save" :disabled="!spuSaleAttrArr.length">保存</el-button>
             <el-button type="primary" @click="cancel">取消</el-button>
         </el-form-item>           
     </el-form> 
 </template>
 
 <script setup lang=ts>
-import type {AllTradeMarkData,SpuImageData,SpuSaleAttrData,AllSaleAttrData,SpuData} from '@/api/product/spu/type'
-import {reqGetAllTradeMark,reqGetSpuImageList,reqGetSpuSaleAttrList,reqGetAllSaleAttrList} from '@/api/product/spu'
+import type {AllTradeMarkData,SpuSaleAttrData,AllSaleAttrData,SpuData} from '@/api/product/spu/type'
+import {reqGetAllTradeMark,reqGetSpuImageList,reqGetSpuSaleAttrList,reqGetAllSaleAttrList,reqSaveOrUpdateSpu} from '@/api/product/spu'
 import { ref,computed } from 'vue';
 import { ElMessage } from 'element-plus';
 
 let $emit = defineEmits(['changeScene'])
 let allTradeMark = ref<AllTradeMarkData[]>([]);
-let spuImageArr = ref<SpuImageData[]>([]);
 let spuSaleAttrArr = ref<SpuSaleAttrData[]>([]);
 let allSaleAttrArr = ref<AllSaleAttrData[]>([]);
-let imageFileList = ref<SpuImageData>([]);
+let imageFileList = ref<any[]>([]);
 let dialogVisible = ref<boolean>(false);
 let dialogImageUrl = ref('')
 let selectedSaleAttr = ref('')
@@ -92,8 +91,32 @@ let spuParams = ref<SpuData>({
     spuPosterList: null
 });
 
+const save = async()=>{
+    spuParams.value.spuImageList = imageFileList.value.map((item:any)=>{
+        return {
+            imgName:item.name,
+            imgUrl:(item.response && item.response.data) || item.url
+        }
+    });
+    spuParams.value.spuSaleAttrList = spuSaleAttrArr.value;
+
+    let result = await reqSaveOrUpdateSpu(spuParams.value);
+    if(result.code==200){
+        ElMessage({
+            type:'success',
+            message:spuParams.value.id?"更新SPU成功" : "添加SPU成功"
+        });
+        $emit('changeScene',{num:0,page:spuParams.value.id?"current" : "first"});
+    }else{
+        ElMessage({
+            type:'error',
+            message:spuParams.value.id?"更新SPU失败" : "添加SPU失败"
+        });
+    }
+}
+
 const cancel =()=>{
-    $emit('changeScene',0);
+    $emit('changeScene',{num:0,page:"current"});
 }
 
 const initGetSpuDta= async(row:SpuData)=>{
@@ -103,7 +126,6 @@ const initGetSpuDta= async(row:SpuData)=>{
     let result2 = await reqGetSpuSaleAttrList(row.id);
     let result3 = await reqGetAllSaleAttrList();
     allTradeMark.value = result.data;
-    spuImageArr.value = result1.data;
     imageFileList.value = result1.data.map((item)=>{
         return {
             name:item.imgName,
@@ -113,6 +135,28 @@ const initGetSpuDta= async(row:SpuData)=>{
     spuSaleAttrArr.value = result2.data;
     allSaleAttrArr.value = result3.data;
 }
+
+const initAddSpu = async(c3Id:number)=>{
+    Object.assign(spuParams.value,{
+        spuName: '',
+        description: '',
+        category3Id: null,
+        tmId: null,
+        spuSaleAttrList: [],
+        spuImageList: [],
+        spuPosterList: null
+    });
+    imageFileList.value = [];
+    spuSaleAttrArr.value = [];
+    selectedSaleAttr.value = '';
+
+    spuParams.value.category3Id = c3Id;
+    let result = await reqGetAllTradeMark();
+    let result3 = await reqGetAllSaleAttrList();
+    allTradeMark.value = result.data;
+    allSaleAttrArr.value = result3.data;
+}
+
 
 const handlePictureCardPreview = (file:any)=>{
     dialogVisible.value = true;
@@ -187,7 +231,7 @@ const toLook = (row:SpuSaleAttrData)=>{
     row.flag = false;
 }
 
-defineExpose({initGetSpuDta})
+defineExpose({initGetSpuDta,initAddSpu})
 
 </script>
 

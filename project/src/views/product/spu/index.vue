@@ -80,6 +80,7 @@
 
   const addSpu=()=>{
     scene.value=1;
+    spu.value.initAddSpu(categoryStore.c3value);
   }
 
   const editSpu=(row:SpuData)=>{
@@ -87,8 +88,14 @@
     spu.value.initGetSpuDta(row);
   }
   
-  const changeScene=(num:number)=>{
-    scene.value = num;
+  const changeScene=(obj:any)=>{
+    scene.value = obj.num;
+    if(obj.page=='first'){
+      getSpu();
+    }else{
+      getSpu(currentPage.value);
+    }
+    
   }
   
 </script>

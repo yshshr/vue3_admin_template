@@ -24,8 +24,8 @@ export const reqGetAllSaleAttrList=()=>request.get<any,GetAllSaleAttrListRespons
 
 export const reqSaveOrUpdateSpu=(data:SpuData)=>{
     if(data.id){
-        request.post<any,any>(API.UPDATESPU_URL,data);
+        return request.post<any,any>(API.UPDATESPU_URL,data);
     }else{
-        request.post<any,any>(API.SAVESPU_URL,data);
+        return request.post<any,any>(API.SAVESPU_URL,data);
     }
 }
