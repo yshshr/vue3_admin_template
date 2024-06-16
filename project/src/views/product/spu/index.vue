@@ -12,7 +12,7 @@
         <el-table-column label="SPU描述" prop="description"></el-table-column>
         <el-table-column label="SPU操作">
           <template  #="{row,$index}">
-            <el-button type="primary" size="small" icon="Plus" title="新增SKU"></el-button>
+            <el-button type="primary" size="small" icon="Plus" title="新增SKU" @click="addSku(row)"></el-button>
             <el-button type="primary" size="small" icon="Edit" title="修改SPU" @click="editSpu(row)"></el-button>
             <el-button type="primary" size="small" icon="View" title="查看SPU"></el-button>
             <el-button type="primary" size="small" icon="Delete" title="删除SPU"></el-button>
@@ -34,7 +34,7 @@
       <SpuForm @change-scene="changeScene" ref="spu"></SpuForm>
     </div>
     <div v-show="scene==2">
-      <SkuForm></SkuForm>
+      <SkuForm @change-scene="changeScene" ref="sku"></SkuForm>
     </div>
   </el-card>
   
@@ -57,6 +57,8 @@
   let spuRecords = ref<SpuData[]>([]);
   let total = ref(0);
   let spu = ref();
+  let sku = ref();
+
 
 
   watch(()=>categoryStore.c3value,()=>{
@@ -96,6 +98,11 @@
       getSpu(currentPage.value);
     }
     
+  }
+
+  const addSku = (row:SpuData)=>{
+    scene.value=2;
+    sku.value.initSkuData(categoryStore.c1value,categoryStore.c2value,row);
   }
   
 </script>
