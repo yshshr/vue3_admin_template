@@ -21,7 +21,7 @@ export interface GetSpuResponseData extends ResponseData{
 }
 
 export interface SpuData {
-    id?: number,
+    id?: number|null,
     createTime?: string,
     updateTime?: string,
     spuName: string,
@@ -96,7 +96,27 @@ export interface AllSaleAttrData {
     name: string
 }
 
+export interface SkuAttrValueData {
+    attrId: number,
+    valueId: number,
+}
 
+export interface SkuSaleAttrValueData {
+    saleAttrId: number,
+    saleAttrValueId: number,
+}
+
+export interface SkuData {
+    category3Id: number|null,
+    spuId: number|null,
+    skuName: string,
+    price: number|null,
+    weight: number|null,
+    skuDesc: string,
+    skuAttrValueList: SkuAttrValueData[],
+    skuSaleAttrValueList: SkuSaleAttrValueData[],
+    skuDefaultImg: string
+}
 
 
 

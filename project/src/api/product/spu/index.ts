@@ -1,5 +1,5 @@
 import request from '@/utils/request';
-import { SpuData,GetSpuResponseData,GetAllTradeMarkResponseData,GetSpuImageListResponseData,GetSpuSaleAttrListResponseData,GetAllSaleAttrListResponseData } from './type';
+import { SkuData,SpuData,GetSpuResponseData,GetAllTradeMarkResponseData,GetSpuImageListResponseData,GetSpuSaleAttrListResponseData,GetAllSaleAttrListResponseData } from './type';
 
 
 enum API {
@@ -9,7 +9,8 @@ enum API {
     GETSPUSALEATTRLIST_URL='/admin/product/spuSaleAttrList/',
     GETALLSALEATTRLIST_URL ='/admin/product/baseSaleAttrList',
     SAVESPU_URL ='/admin/product/saveSpuInfo',
-    UPDATESPU_URL ='/admin/product/updateSpuInfo'
+    UPDATESPU_URL ='/admin/product/updateSpuInfo',
+    ADDSKU_URL = '/admin/product/saveSkuInfo'
 }
 
 export const reqGetSpu=(page:number,limit:number,c3:number|null)=>request.get<any,GetSpuResponseData>(API.GETSPU_URL+`${page}/${limit}?category3Id=${c3}`);
@@ -29,3 +30,6 @@ export const reqSaveOrUpdateSpu=(data:SpuData)=>{
         return request.post<any,any>(API.SAVESPU_URL,data);
     }
 }
+
+export const reqSaveSkuInfo=(data:SkuData)=> request.post<any,any>(API.ADDSKU_URL,data);
+    
