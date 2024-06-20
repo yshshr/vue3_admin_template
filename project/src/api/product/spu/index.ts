@@ -1,5 +1,5 @@
 import request from '@/utils/request';
-import { SkuData,SpuData,GetSpuResponseData,GetAllTradeMarkResponseData,GetSpuImageListResponseData,GetSpuSaleAttrListResponseData,GetAllSaleAttrListResponseData } from './type';
+import { SkuData,SpuData,GetSpuResponseData,GetAllTradeMarkResponseData,GetSpuImageListResponseData,GetSpuSaleAttrListResponseData,GetAllSaleAttrListResponseData,GetSkuListResponseData } from './type';
 
 
 enum API {
@@ -10,7 +10,9 @@ enum API {
     GETALLSALEATTRLIST_URL ='/admin/product/baseSaleAttrList',
     SAVESPU_URL ='/admin/product/saveSpuInfo',
     UPDATESPU_URL ='/admin/product/updateSpuInfo',
-    ADDSKU_URL = '/admin/product/saveSkuInfo'
+    ADDSKU_URL = '/admin/product/saveSkuInfo',
+    GETSKU_URL = '/admin/product/findBySpuId/',
+    DELETESKU_URL = '/admin/product/deleteSpu/',
 }
 
 export const reqGetSpu=(page:number,limit:number,c3:number|null)=>request.get<any,GetSpuResponseData>(API.GETSPU_URL+`${page}/${limit}?category3Id=${c3}`);
@@ -33,3 +35,7 @@ export const reqSaveOrUpdateSpu=(data:SpuData)=>{
 
 export const reqSaveSkuInfo=(data:SkuData)=> request.post<any,any>(API.ADDSKU_URL,data);
     
+export const reqGetSkuList=(spuId:number|null)=>request.get<any,GetSkuListResponseData>(API.GETSKU_URL + `${spuId}`);
+
+export const reqDeleteSpu=(spuId:number|null)=>request.delete<any,any>(API.DELETESKU_URL + `${spuId}`);
+

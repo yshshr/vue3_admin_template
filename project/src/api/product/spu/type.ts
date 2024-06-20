@@ -119,6 +119,9 @@ export interface SkuData {
 }
 
 
+export interface GetSkuListResponseData extends ResponseData{
+    data:SkuData[]
+}
 
 
 

@@ -51,7 +51,7 @@
       </el-table>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" >保存</el-button>
+      <el-button type="primary" @click="save">保存</el-button>
       <el-button type="primary" @click="cancel">取消</el-button>
     </el-form-item>
   </el-form>
@@ -59,9 +59,10 @@
 
 <script setup lang=ts>
   import {reqAttrInfoList} from '@/api/product/attr'
-  import {reqGetSpuSaleAttrList,reqGetSpuImageList} from '@/api/product/spu'
+  import {reqGetSpuSaleAttrList,reqGetSpuImageList,reqSaveSkuInfo} from '@/api/product/spu'
 
   import type {SpuData,SkuData} from '@/api/product/spu/type'
+import { ElMessage } from 'element-plus';
   import { ref,reactive } from 'vue';
 
   let $emit = defineEmits(['changeScene'])
@@ -104,6 +105,44 @@
       imgTable.value.toggleRowSelection(item,false);
     });
     imgTable.value.toggleRowSelection(row,true);
+  }
+
+  const save = async()=>{
+    skuParams.skuAttrValueList = attrArr.value.reduce((prev:any,cur:any)=>{
+      if(cur.attrIdAndAttrValueId){
+        let [attrId,valueId] = cur.attrIdAndAttrValueId.split(":");
+        prev.push({
+          attrId,valueId
+        });
+      }
+      return prev;
+    },[]);
+
+    skuParams.skuSaleAttrValueList = saleAttrArr.value.reduce((prev:any,cur:any)=>{
+      if(cur.saleAttrIdAndSaleAttrValueId){
+        let [saleAttrId,saleAttrValueId] = cur.saleAttrIdAndSaleAttrValueId.split(":");
+        prev.push({
+          saleAttrId,saleAttrValueId
+        });
+      }
+      return prev;
+    },[]);
+
+
+   let result = await reqSaveSkuInfo(skuParams);
+   if(result.code==200){
+      ElMessage({
+        type:'success',
+        message:'添加SKU成功'
+      })
+      $emit('changeScene',{num:0,page:"current"});
+   }else{
+      ElMessage({
+          type:'error',
+          message:'添加SKU失败'
+      })
+   }
+
   }
 
   defineExpose({initSkuData})
