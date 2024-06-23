@@ -7,25 +7,29 @@ export interface ResponseData{
 export interface SkuAttrValueData {
     attrId: number,
     valueId: number,
+    id?:number,
+    valueName:string
 }
 
 export interface SkuSaleAttrValueData {
     saleAttrId: number,
     saleAttrValueId: number,
+    id?:number,
+    saleAttrValueName:string
 }
 
 export interface SkuData {
-    category3Id: number|null,
-    spuId: number|null,
-    skuName: string,
-    price: number|null,
-    weight: number|null,
-    skuDesc: string,
-    skuAttrValueList: SkuAttrValueData[],
-    skuSaleAttrValueList: SkuSaleAttrValueData[],
-    skuDefaultImg: string,
-    isSale:number,
-    id:number
+    category3Id?: number|null,
+    spuId?: number|null,
+    skuName?: string,
+    price?: number|null,
+    weight?: number|null,
+    skuDesc?: string,
+    skuAttrValueList?: SkuAttrValueData[],
+    skuSaleAttrValueList?: SkuSaleAttrValueData[],
+    skuDefaultImg?: string,
+    isSale?:number,
+    id?:number
 }
 
 export interface GetSkuListResponseData extends ResponseData {
@@ -42,4 +46,8 @@ export interface GetSkuListResponseData extends ResponseData {
         searchCount: boolean,
         pages: number
     }
+}
+
+export interface GetSkuInfoResponseData extends ResponseData {
+    data:SkuData
 }
