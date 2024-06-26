@@ -11,7 +11,7 @@
       </el-form>
     </el-card>
     <el-card style="margin:10px 0px">
-      <el-button type="primary">添加用户</el-button>
+      <el-button type="primary" @click="addUser">添加用户</el-button>
       <el-button type="primary">批量删除</el-button>
       <el-table style="margin:10px 0px" border :data="userArr">
         <el-table-column type="selection" align="center">
@@ -31,9 +31,11 @@
         <el-table-column label="更新时间" align="center" prop="updateTime" show-overflow-tooltip="true">
         </el-table-column>
         <el-table-column label="操作" align="center" width="300px">
-          <el-button type="primary" size="small" icon="User">分类角色</el-button>
-          <el-button type="primary" size="small" icon="Edit">编辑</el-button>
-          <el-button type="primary" size="small" icon="Delete">删除</el-button>
+          <template #="{row,$index}">
+            <el-button type="primary" size="small" icon="User">分类角色</el-button>
+            <el-button type="primary" size="small" icon="Edit" @click="editUser(row)">编辑</el-button>
+            <el-button type="primary" size="small" icon="Delete">删除</el-button>
+          </template>
         </el-table-column>
       </el-table>
       <el-pagination
@@ -47,6 +49,30 @@
       @current-change="getUserList"
     />
     </el-card>
+    <el-drawer v-model="drawer">
+    <template #header>
+      <h4>添加用户</h4>
+    </template>
+    <template #default>
+      <el-form>
+        <el-form-item label="用户名字">
+          <el-input placeholder="请输入用户名字"></el-input>
+        </el-form-item>
+        <el-form-item label="用户名称">
+          <el-input placeholder="请输入用户名称"></el-input>
+        </el-form-item>
+        <el-form-item label="用户密码">
+          <el-input placeholder="请输入用密码"></el-input>
+        </el-form-item>
+      </el-form>
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button >取消</el-button>
+        <el-button type="primary">确定</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup lang=ts>
@@ -58,6 +84,8 @@ let curPage = ref<number>(1);
 let pageSize = ref<number>(10);
 let total =ref<number>(0);
 let userArr = ref<UserData[]>([])
+let drawer = ref<boolean>(false);
+
 
 onMounted(()=>{
   getUserList()
@@ -74,6 +102,14 @@ const getUserList =async(pager=1)=>{
 
 const handler = ()=>{
   getUserList();
+}
+
+const addUser = ()=>{
+  drawer.value = true;
+}
+
+const editUser = (row: UserData)=>{
+  drawer.value = true;
 }
 
 </script>
