@@ -49,42 +49,50 @@
       @current-change="getUserList"
     />
     </el-card>
-    <el-drawer v-model="drawer">
+    <el-drawer v-model="drawer" @close="closeDrawer">
     <template #header>
-      <h4>添加用户</h4>
+      <h4>{{userParams.id?'修改用户':'添加用户'}}</h4>
     </template>
     <template #default>
-      <el-form>
-        <el-form-item label="用户名字">
-          <el-input placeholder="请输入用户名字"></el-input>
+      <el-form :model="userParams" :rules="rules" ref="formRef">
+        <el-form-item prop="username" label="用户名字">
+          <el-input placeholder="请输入用户名字" v-model="userParams.username"></el-input>
         </el-form-item>
-        <el-form-item label="用户名称">
-          <el-input placeholder="请输入用户名称"></el-input>
+        <el-form-item  prop="name"label="用户名称">
+          <el-input placeholder="请输入用户名称" v-model="userParams.name"></el-input>
         </el-form-item>
-        <el-form-item label="用户密码">
-          <el-input placeholder="请输入用密码"></el-input>
+        <el-form-item prop="password" label="用户密码" v-if="!userParams.id">
+          <el-input placeholder="请输入用密码" v-model="userParams.password"></el-input>
         </el-form-item>
       </el-form>
     </template>
     <template #footer>
       <div style="flex: auto">
-        <el-button >取消</el-button>
-        <el-button type="primary">确定</el-button>
+        <el-button @click="cancel">取消</el-button>
+        <el-button type="primary" @click="saveUser">确定</el-button>
       </div>
     </template>
   </el-drawer>
 </template>
 
 <script setup lang=ts>
-import { ref,onMounted } from 'vue';
-import {reqGetUserList} from '@/api/acl/user'
+import { ref,onMounted, reactive } from 'vue';
+import {reqGetUserList,reqAddOrUpdateUser} from '@/api/acl/user'
 import type {UserData,GetUserResponseData} from '@/api/acl/user/type'
+import { ElMessage,FormRules } from 'element-plus';
 
 let curPage = ref<number>(1);
 let pageSize = ref<number>(10);
 let total =ref<number>(0);
 let userArr = ref<UserData[]>([])
 let drawer = ref<boolean>(false);
+let userParams = reactive<UserData>({
+  username : '',
+  password : '',
+  name : '',
+});
+let formRef = ref<any>();
+
 
 
 onMounted(()=>{
@@ -106,10 +114,81 @@ const handler = ()=>{
 
 const addUser = ()=>{
   drawer.value = true;
+  Object.assign(userParams,{
+    id:null,
+    username : '',
+    password : '',
+    name : '',
+  });
 }
 
 const editUser = (row: UserData)=>{
+  Object.assign(userParams,row);
   drawer.value = true;
+}
+
+const saveUser =async()=>{
+  await formRef.value.validate();
+  let result = await reqAddOrUpdateUser(userParams);
+  if(result.code==200){
+    drawer.value = false;
+    ElMessage({
+      type:'success',
+      message : userParams.id? '更新用户成功' : '添加用户成功'
+    })
+    getUserList(userParams.id?curPage.value:1);
+    window.location.reload();
+  }else{
+    drawer.value = false;
+    ElMessage({
+      type:'error',
+      message : userParams.id? '更新用户失败' : '添加用户失败'
+    })
+  }
+}
+
+const cancel = ()=>{
+  drawer.value = false;
+}
+
+const validateUsername = (_rule:any,value:any,callback:any)=>{
+  if(value.length>=3){
+    callback();
+  }else{
+    callback(new Error('用户名字至少3位!'));
+  }
+}
+
+const validateName = (_rule:any,value:any,callback:any)=>{
+  if(value.length>=3){
+    callback();
+  }else{
+    callback(new Error('用户名称至少3位!'));
+  }
+}
+
+const validatePassword = (_rule:any,value:any,callback:any)=>{
+  if(value.length>=6){
+    callback();
+  }else{
+    callback(new Error('用户密码至少6位!'));
+  }
+}
+
+const rules = reactive<FormRules<UserData>>({
+  username:[
+    {required:true,validator:validateUsername,trigger:'blur'}
+  ],
+  name:[
+    {required:true,validator:validateName,trigger:'blur'}
+  ],
+  password:[
+    {required:true,validator:validatePassword,trigger:'blur'}
+  ]
+})
+
+const closeDrawer =()=>{
+  formRef.value.resetFields();
 }
 
 </script>

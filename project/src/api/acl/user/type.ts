@@ -11,8 +11,8 @@ export interface UserData{
     username: string,
     password: string,
     name: string,
-    phone: string,
-    roleName:string
+    phone?: string,
+    roleName?:string
 }
 
 export interface GetUserResponseData extends ResponseData{
