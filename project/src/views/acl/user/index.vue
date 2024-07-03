@@ -32,7 +32,7 @@
         </el-table-column>
         <el-table-column label="操作" align="center" width="300px">
           <template #="{row,$index}">
-            <el-button type="primary" size="small" icon="User">分类角色</el-button>
+            <el-button type="primary" size="small" icon="User" @click="setRole(row)">分配角色</el-button>
             <el-button type="primary" size="small" icon="Edit" @click="editUser(row)">编辑</el-button>
             <el-button type="primary" size="small" icon="Delete">删除</el-button>
           </template>
@@ -73,12 +73,44 @@
       </div>
     </template>
   </el-drawer>
+  <el-drawer v-model="roleDrawer">
+    <template #header>
+      <h4>分配角色(职位)</h4>
+    </template>
+    <template #default>
+      <el-form>
+        <el-form-item label="用户姓名">
+          <el-input v-model="userParams.username" disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="职位列表">
+          <el-checkbox
+            v-model="checkAll"
+            :indeterminate="isIndeterminate"
+            @change="handleCheckAllChange">全选</el-checkbox>
+          <el-checkbox-group
+              v-model="checkedRoles"
+              @change="handleCheckedRolesChange">
+              <el-checkbox v-for="(role,index) in allRole" :key="role" :label="role" :value="role">
+                {{ role.roleName }}
+              </el-checkbox>
+            </el-checkbox-group>
+        </el-form-item>
+
+      </el-form>
+    </template>
+    <template #footer>
+      <div style="flex: auto">
+        <el-button >取消</el-button>
+        <el-button type="primary">确定</el-button>
+      </div>
+    </template>
+  </el-drawer>
 </template>
 
 <script setup lang=ts>
 import { ref,onMounted, reactive } from 'vue';
-import {reqGetUserList,reqAddOrUpdateUser} from '@/api/acl/user'
-import type {UserData,GetUserResponseData} from '@/api/acl/user/type'
+import {reqGetUserList,reqAddOrUpdateUser,reqGetAllUserRole} from '@/api/acl/user'
+import type {UserData,GetUserResponseData,GetUserRoleResponseData,UserRoleData} from '@/api/acl/user/type'
 import { ElMessage,FormRules } from 'element-plus';
 
 let curPage = ref<number>(1);
@@ -92,8 +124,13 @@ let userParams = reactive<UserData>({
   name : '',
 });
 let formRef = ref<any>();
-
-
+let roleDrawer = ref<boolean>(false);
+let allRole = ref<UserRoleData[]>([]);
+let checkAll = ref<boolean>(false);
+let isIndeterminate = ref<boolean>(false);
+let checkedRoles = ref<UserRoleData[]>([]);
+let userRole = ref<UserRoleData[]>([]);
+  
 
 onMounted(()=>{
   getUserList()
@@ -189,6 +226,31 @@ const rules = reactive<FormRules<UserData>>({
 
 const closeDrawer =()=>{
   formRef.value.resetFields();
+}
+
+const setRole = async(row:UserData)=>{
+  Object.assign(userParams,row);
+  let result:GetUserRoleResponseData = await reqGetAllUserRole(row.id as number);
+  if(result.code==200){
+    roleDrawer.value = true;
+    userRole.value = result.data.assignRoles;
+    allRole.value = result.data.allRolesList;
+    checkedRoles.value =  result.data.assignRoles;
+    let checkedCount = checkedRoles.value.length;
+    checkAll.value = allRole.value.length === checkedCount;
+    isIndeterminate.value = checkedCount>0 && checkedCount <allRole.value.length;
+  }
+}
+
+const handleCheckAllChange =(val: boolean)=>{
+  checkedRoles.value = val? allRole.value : [];
+  isIndeterminate.value = false;
+}
+
+const handleCheckedRolesChange =(value: UserRoleData[])=>{
+  let checkedCount = value.length;
+  checkAll.value = allRole.value.length === checkedCount;
+  isIndeterminate.value = checkedCount>0 && checkedCount <allRole.value.length;
 }
 
 </script>
