@@ -2,18 +2,22 @@
     <el-card>
       <el-form inline="true" class="user_form">
         <el-form-item label="用户名:">
-          <el-input placeholder="请你输入搜索用户名"></el-input>
+          <el-input placeholder="请你输入搜索用户名" v-model="searchuserName"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">搜索</el-button>
-          <el-button type="primary">重置</el-button>
+          <el-button type="primary" @click="searchByUserName" :disabled="searchuserName==''?true:false">搜索</el-button>
+          <el-button type="primary" @click="reset">重置</el-button>
         </el-form-item>
       </el-form>
     </el-card>
     <el-card style="margin:10px 0px">
       <el-button type="primary" @click="addUser">添加用户</el-button>
-      <el-button type="primary">批量删除</el-button>
-      <el-table style="margin:10px 0px" border :data="userArr">
+      <el-popconfirm title="确定要批量删除选中项吗?" @confirm="batchDeleteUser">
+        <template #reference>
+          <el-button type="danger" :disabled="selectedUserArr.length?false:true">批量删除</el-button>
+        </template>
+      </el-popconfirm>
+      <el-table style="margin:10px 0px" border :data="userArr" @selection-change="handleSelectUser">
         <el-table-column type="selection" align="center">
         </el-table-column>
         <el-table-column label="#" type="index" align="center">
@@ -34,7 +38,11 @@
           <template #="{row,$index}">
             <el-button type="primary" size="small" icon="User" @click="setRole(row)">分配角色</el-button>
             <el-button type="primary" size="small" icon="Edit" @click="editUser(row)">编辑</el-button>
-            <el-button type="primary" size="small" icon="Delete">删除</el-button>
+            <el-popconfirm :title="`您确定要删除${row.username}吗?`" @confirm="deleteUser(row)">
+              <template #reference>
+                <el-button type="primary" size="small" icon="Delete">删除</el-button>
+              </template>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -101,7 +109,7 @@
     <template #footer>
       <div style="flex: auto">
         <el-button >取消</el-button>
-        <el-button type="primary">确定</el-button>
+        <el-button type="primary" @click="confirmUserRole">确定</el-button>
       </div>
     </template>
   </el-drawer>
@@ -109,9 +117,10 @@
 
 <script setup lang=ts>
 import { ref,onMounted, reactive } from 'vue';
-import {reqGetUserList,reqAddOrUpdateUser,reqGetAllUserRole} from '@/api/acl/user'
-import type {UserData,GetUserResponseData,GetUserRoleResponseData,UserRoleData} from '@/api/acl/user/type'
+import {reqGetUserList,reqAddOrUpdateUser,reqGetAllUserRole,reqSetUserRole,reqRemoveUser,reqBatchRemoveUser} from '@/api/acl/user'
+import type {UserData,GetUserResponseData,GetUserRoleResponseData,UserRoleData,SetUserRoleData} from '@/api/acl/user/type'
 import { ElMessage,FormRules } from 'element-plus';
+import useLayOutSettingStore from '@/store/modules/setting'
 
 let curPage = ref<number>(1);
 let pageSize = ref<number>(10);
@@ -130,7 +139,10 @@ let checkAll = ref<boolean>(false);
 let isIndeterminate = ref<boolean>(false);
 let checkedRoles = ref<UserRoleData[]>([]);
 let userRole = ref<UserRoleData[]>([]);
-  
+let selectedUserArr = ref<UserData[]>([]);
+let searchuserName = ref<string>('');
+let layOutSettingStore = useLayOutSettingStore();
+
 
 onMounted(()=>{
   getUserList()
@@ -138,7 +150,7 @@ onMounted(()=>{
 
 const getUserList =async(pager=1)=>{
   curPage.value = pager;
-  let result:GetUserResponseData = await reqGetUserList(curPage.value,pageSize.value);
+  let result:GetUserResponseData = await reqGetUserList(curPage.value,pageSize.value,searchuserName.value);
   if(result.code==200){
     userArr.value = result.data.records;
     total.value = result.data.total;
@@ -251,6 +263,65 @@ const handleCheckedRolesChange =(value: UserRoleData[])=>{
   let checkedCount = value.length;
   checkAll.value = allRole.value.length === checkedCount;
   isIndeterminate.value = checkedCount>0 && checkedCount <allRole.value.length;
+}
+
+const confirmUserRole = async()=>{
+  let setUserRoleDate:SetUserRoleData ={
+    userId: userParams.id as number,
+    roleIdList: checkedRoles.value.map((item)=>{
+      return item.id
+    })
+  }
+  
+  let result = await reqSetUserRole(setUserRoleDate);
+  if(result.code==200){
+    roleDrawer.value =false;
+    ElMessage({
+      type:'success',
+      message:'分配用户角色成功'
+    });
+    getUserList(curPage.value);
+  }
+}
+
+const deleteUser = async(row:UserData)=>{
+  let result= await reqRemoveUser(row.id as number);
+  if(result.code==200){
+    ElMessage({
+      type:'success',
+      message:'删除用户成功'
+    });
+    getUserList(userArr.value.length>1 ? curPage.value: curPage.value-1);
+  }
+}
+
+const handleSelectUser = (val:UserData[])=>{
+  selectedUserArr.value = val;
+}
+
+const batchDeleteUser = async()=>{
+  let selectedCount = selectedUserArr.value.length;
+  let reqBatchRemoveUserBody = selectedUserArr.value.map((item)=>{
+    return item.id as number; 
+  })
+  console.log(reqBatchRemoveUserBody);
+  let result = await reqBatchRemoveUser(reqBatchRemoveUserBody);
+  if(result.code==200){
+    ElMessage({
+      type:'success',
+      message:'批量删除用户成功'
+    });
+    getUserList(userArr.value.length > selectedCount ? curPage.value: curPage.value-1);
+  }
+}
+
+const searchByUserName = ()=>{
+  getUserList();
+  searchuserName.value='';
+}
+
+const reset = ()=>{
+  layOutSettingStore.refresh = !layOutSettingStore.refresh; 
 }
 
 </script>

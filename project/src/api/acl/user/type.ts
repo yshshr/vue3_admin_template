@@ -39,3 +39,8 @@ export interface GetUserRoleResponseData extends ResponseData{
         allRolesList: UserRoleData[]
     }
 }
+
+export interface SetUserRoleData{
+    userId: number,
+    roleIdList: number[]
+}
