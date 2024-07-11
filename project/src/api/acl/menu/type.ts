@@ -24,4 +24,11 @@ export interface GetAllPermissionResponseData extends ResponseData{
     data:PermissionData[]
 }
 
+export interface SavePermissionBody{
+    id?:number,
+    pid: number,
+    name: string,
+    code: string,
+    level: number
+}
 
