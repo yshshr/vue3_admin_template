@@ -21,7 +21,7 @@ import {useRoute} from 'vue-router'
 let layOutSettingStore = useLayOutSettingStore();
 // let isFold = ref(true);
 let $route = useRoute();
-console.log($route.matched);
+console.log('route.matched'+JSON.stringify($route.matched));
 
 const changeFold=()=>{
     layOutSettingStore.fold=!layOutSettingStore.fold;

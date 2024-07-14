@@ -12,7 +12,7 @@
       </el-menu-item>
     </template>
     <template v-if="item.children && item.children.length==1">
-      <el-menu-item :index="item.path" v-if="!item.meta.ishidden" @click="goRoute">
+      <el-menu-item :index="item.children[0].path" v-if="!item.children[0].meta.ishidden" @click="goRoute">
         <el-icon>
           <component :is="item.meta.icon"></component>
         </el-icon>
