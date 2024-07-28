@@ -14,6 +14,7 @@ import '@/styles/index.scss'
 import router from './router'
 import pinia from './store'
 import './permission'
+import 'element-plus/theme-chalk/dark/css-vars.css'
 
 
 
